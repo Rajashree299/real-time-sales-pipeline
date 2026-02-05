@@ -61,6 +61,36 @@ To run the full streaming pipeline:
    ```
 3. **Run ETL Jobs**: Deploy the Glue scripts to move data through the Gold layer.
 
+## My Role + What I Learned
+This project was a solo effort where I acted as the end-to-end Data Engineer. I was responsible for:
+- Designing the multi-layer S3 data lake architecture.
+- Writing the PySpark streaming logic and Glue ETL jobs.
+- Managing the Redshift schema and analytical SQL suite.
+
+**Key Learnings:**
+- **Streaming Reliability:** I learned how critical checkpointing and schema enforcement are when dealing with Kafka. Without them, even one bad JSON record can kill a production job.
+- **Architectural Trade-offs:** Building the local simulation first taught me how to decouple logic from infrastructure, making it much easier to debug PySpark transformations before deploying to the cloud.
+- **Data Quality as a First-Class Citizen:** I realized that pipelines aren't "set it and forget it." Monitoring row count drift and null percentages is what makes a pipeline production-ready.
+
+## Sample Pipeline Output
+I've included a local simulation runner that mimics the full cloud flow. Here is what the automated data progression looks like as it moves through the layers:
+
+```text
+Processing Batch: Ingesting from Kafka Simulation...
+[Bronze Layer] Saved 100 raw events to Parquet.
+[Silver Layer] Cleaned 100 records. Deduplication removed 0 duplicates.
+[Gold Layer] Aggregated revenue by category. Total Gold Records: 8.
+
+Sample Gold Record (Aggregated):
+{
+  "category": "Electronics",
+  "total_revenue": 4520.50,
+  "order_count": 42,
+  "avg_order_value": 107.63,
+  "window_start": "2024-05-20 10:00:00"
+}
+```
+
 ## Insights & Lessons
 I used the final Redshift data to answer some real-world business questions, like tracking month-over-month growth and finding the top-selling categories. You can find these queries in `sql/analytics_queries.sql`.
 
